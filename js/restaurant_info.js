@@ -56,7 +56,9 @@ fillRestaurantHTML = (restaurant = self.restaurant) => {
   address.innerHTML = restaurant.address;
 
   const image = document.getElementById('restaurant-img');
-  image.className = 'restaurant-img'
+  image.className = 'restaurant-img';
+  image.alt = `Image of ${restaurant.name} Restaurant`;
+  image.title = restaurant.name;
   const urlX1 = DBHelper.imageUrlForRestaurant(restaurant, '2x', 640);
   const urlX2 = DBHelper.imageUrlForRestaurant(restaurant, 'large_2x', 1280);
   image.srcset = `${urlX1} 1x, ${urlX2} 2x`
@@ -98,7 +100,7 @@ fillRestaurantHoursHTML = (operatingHours = self.restaurant.operating_hours) => 
  */
 fillReviewsHTML = (reviews = self.restaurant.reviews) => {
   const container = document.getElementById('reviews-container');
-  const title = document.createElement('h2');
+  const title = document.createElement('h3');
   title.innerHTML = 'Reviews';
   container.appendChild(title);
 
