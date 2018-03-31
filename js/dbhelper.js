@@ -149,8 +149,9 @@ class DBHelper {
   /**
    * Restaurant image URL.
    */
-  static imageUrlForRestaurant(restaurant) {
-    return (`/img/${restaurant.photograph}`);
+  static imageUrlForRestaurant(restaurant, dpr = '1x', sufix = '', extension = 'jpg') {
+    const dynamicUrl = sufix ? `-${sufix}_${dpr}.${extension}` : `-${dpr}.${extension}`;
+    return (`/img/${restaurant.photograph}${dynamicUrl}`);
   }
 
   /**
@@ -162,7 +163,8 @@ class DBHelper {
       title: restaurant.name,
       url: DBHelper.urlForRestaurant(restaurant),
       map: map,
-      animation: google.maps.Animation.DROP}
+      animation: google.maps.Animation.DROP
+    }
     );
     return marker;
   }
