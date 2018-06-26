@@ -59,6 +59,7 @@ module.exports = function (grunt) {
   grunt.loadNpmTasks('grunt-contrib-cssmin');
   grunt.loadNpmTasks('grunt-contrib-clean');
 
+  grunt.registerTask('images', ['responsive_images'])
   grunt.registerTask('default', ['clean','uglify', 'cssmin']);
 
 };
