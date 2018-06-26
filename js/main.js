@@ -130,8 +130,12 @@ fillRestaurantsHTML = (restaurants = self.restaurants) => {
     ul.append(createRestaurantHTML(restaurant));
   });
   addMarkersToMap();
+  lazyloadImages();
 }
 
+function lazyloadImages(){
+  inView('.restaurant-img').on('enter', image=> image.srcset = image.getAttribute('data-src-set'));
+}
 /**
  * Create restaurant HTML.
  */
@@ -144,7 +148,8 @@ createRestaurantHTML = (restaurant) => {
   image.className = 'restaurant-img';
   const urlX1 = DBHelper.imageUrlForRestaurant(restaurant, '1x', 320);
   const urlX2 = DBHelper.imageUrlForRestaurant(restaurant, '2x', 640);
-  image.srcset = `${urlX1} 1x, ${urlX2} 2x`
+  image.srcset = 'icons/1px.png';
+  image.setAttribute('data-src-set',`${urlX1} 1x, ${urlX2} 2x`);
   image.src = urlX1;
   li.append(image);
 

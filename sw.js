@@ -1,7 +1,7 @@
 const CACHE_NAME = 'restaurant-review-';
 const CACHE_VERSION = 'v1';
 const DB_NAME = 'restaurants'
-importScripts('./js/idb.js');
+importScripts('./dist/idb.min.js');
 
 
 const dbPromise = idb.open("udacity-restaurant", 1, upgradeDB => {
@@ -66,11 +66,11 @@ self.addEventListener('fetch', event => {
 self.addEventListener('install', event => {
   const urlToCache = [
     '/',
-    '/js/main.js',
-    '/js/dbhelper.js',
-    '/js/restaurant_info.js',
-    '/js/idb.js',
-    '/css/styles.css'
+    '/dist/main.min.js',
+    '/dist/dbhelper.min.js',
+    '/dist/restaurant_info.min.js',
+    '/dist/idb.min.js',
+    '/dist/styles.min.css'
   ]
   event.waitUntil(
     caches.open(`${CACHE_NAME}${CACHE_VERSION}`).then(cache => cache.addAll(urlToCache))
