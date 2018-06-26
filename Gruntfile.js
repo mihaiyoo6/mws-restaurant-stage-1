@@ -1,6 +1,31 @@
 module.exports = function (grunt) {
 
   grunt.initConfig({
+    clean: ['dist'],
+    uglify: {
+      dist: {
+        files: {
+          'dist/main.min.js': 'js/main.js',
+          'dist/dbhelper.min.js': 'js/dbhelper.js',
+          'dist/restaurant_info.min.js': 'js/restaurant_info.js',
+          'dist/idb.min.js': 'js/idb.js',
+        }
+      },
+      options: {
+        report: 'gzip'
+      }
+    },
+    cssmin: {
+      options: {
+        mergeIntoShorthands: false,
+        roundingPrecision: -1
+      },
+      target: {
+        files: {
+          'dist/styles.min.css': ['css/styles.css']
+        }
+      }
+    },
     responsive_images: {
       dev: {
         options: {
@@ -26,10 +51,14 @@ module.exports = function (grunt) {
           dest: 'img/'
         }]
       }
-    },
+    }
   });
 
   grunt.loadNpmTasks('grunt-responsive-images');
-  grunt.registerTask('default', ['responsive_images']);
+  grunt.loadNpmTasks('grunt-contrib-uglify-es');
+  grunt.loadNpmTasks('grunt-contrib-cssmin');
+  grunt.loadNpmTasks('grunt-contrib-clean');
+
+  grunt.registerTask('default', ['clean','uglify', 'cssmin']);
 
 };

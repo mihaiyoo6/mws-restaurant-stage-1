@@ -1,26 +1,75 @@
 const CACHE_NAME = 'restaurant-review-';
 const CACHE_VERSION = 'v1';
+const DB_NAME = 'restaurants'
+importScripts('./js/idb.js');
+
+
+const dbPromise = idb.open("udacity-restaurant", 1, upgradeDB => {
+  switch (upgradeDB.oldVersion) {
+    case 0:
+      upgradeDB.createObjectStore(DB_NAME, { keyPath: "id" });
+  }
+});
+
 self.addEventListener('fetch', event => {
   console.log('event', event.request.url);
-  event.respondWith(
-    caches.open(`${CACHE_NAME}${CACHE_VERSION}`).then(function (cache) {
-      return cache.match(event.request).then(function (response) {
-        return response || fetch(event.request).then(function (response) {
-          cache.put(event.request, response.clone());
-          return response;
+
+  const checkURL = new URL(event.request.url);
+  if (checkURL.port === "1337") {
+    console.log('check for IDB');
+    event.respondWith(
+      dbPromise
+      .then(db=>db
+        .transaction(DB_NAME)
+        .objectStore(DB_NAME)
+        .get(DB_NAME)
+      )
+      .then(data => {
+        return (
+          (data && data.data) ||
+          fetch(event.request)
+            .then(fetchResponse => fetchResponse.json())
+            .then(json => {
+              return dbPromise.then(db => {
+                const tx = db.transaction(DB_NAME, "readwrite");
+                tx.objectStore(DB_NAME).put({
+                  id: DB_NAME,
+                  data: json
+                });
+                return json;
+              });
+            })
+        );
+      })
+      .then(finalResponse => {
+        return new Response(JSON.stringify(finalResponse));
+      })
+      .catch(error => {
+        return new Response("Error fetching data", { status: 500 });
+      })
+    )
+  }else{
+    event.respondWith(
+      caches.open(`${CACHE_NAME}${CACHE_VERSION}`).then(function (cache) {
+        return cache.match(event.request).then(function (response) {
+          return response || fetch(event.request).then(function (response) {
+            cache.put(event.request, response.clone());
+            return response;
+          });
         });
-      });
-    })
-  )
+      })
+    )
+  }
+
 });
 
 self.addEventListener('install', event => {
   const urlToCache = [
     '/',
     '/js/main.js',
-    'js/dbhelper.js',
+    '/js/dbhelper.js',
     '/js/restaurant_info.js',
-    '/data/restaurants.json',
+    '/js/idb.js',
     '/css/styles.css'
   ]
   event.waitUntil(

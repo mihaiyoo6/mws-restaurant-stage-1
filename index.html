@@ -8,14 +8,16 @@
   <link rel="icon" href="/imgs/icon.png">
   <link rel="manifest" href="/manifest.json">
   <link rel="stylesheet" src="http://normalize-css.googlecode.com/svn/trunk/normalize.css" />
-  <link rel="stylesheet" href="css/styles.css">
+  <link rel="stylesheet" href="dist/styles.min.css">
   <title>Restaurant Reviews</title>
 </head>
 
 <body>
   <header>
     <nav>
-      <h1><a href="/">Restaurant Reviews</a></h1>
+      <h1>
+        <a href="/">Restaurant Reviews</a>
+      </h1>
     </nav>
   </header>
 
@@ -37,24 +39,29 @@
     </section>
   </main>
 
-  <script type="application/javascript" charset="utf-8" src="js/dbhelper.js"></script>
-  <script type="application/javascript" charset="utf-8" src="js/main.js"></script>
+  <script type="application/javascript" charset="utf-8" src="dist/idb.min.js"></script>
+  <script type="application/javascript" charset="utf-8" src="dist/dbhelper.min.js"></script>
+  <script type="application/javascript" charset="utf-8" src="dist/main.min.js"></script>
+  <!-- <script type="application/javascript" charset="utf-8" src="dist/idb.min.js"></script> -->
   <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyABJ1BMOMwgqMYbAOWl5FJIANfj67nQKYc&libraries=places&callback=initMap"></script>
   <script>
     if ('serviceWorker' in navigator) {
-     window.addEventListener('load', function() {
-      navigator.serviceWorker.register('/sw.js')
-        .then(()=>{
-          console.log('SW registered');
-        }).catch(()=>{
-          console.err('SW registration failed');
-        });
-    });
-  }
+      window.addEventListener('load', function () {
+        navigator.serviceWorker.register('./sw.js')
+          .then(() => {
+            console.log('SW registered');
+          }).catch(() => {
+            console.err('SW registration failed');
+          });
+      });
+    }
   </script>
 
   <footer id="footer">
-    Copyright (c) 2017 <a href="/"><strong>Restaurant Reviews</strong></a> All Rights Reserved.
+    Copyright (c) 2017
+    <a href="/">
+      <strong>Restaurant Reviews</strong>
+    </a> All Rights Reserved.
   </footer>
 
 </body>
