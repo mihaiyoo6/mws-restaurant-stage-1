@@ -7,6 +7,7 @@
     "start": "python -m SimpleHTTPServer 8000",
     "generate-images": "grunt images",
     "build-assets": "grunt",
+    "build-assets:watch": "grunt watch",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -29,6 +30,7 @@
     "grunt-contrib-nodeunit": "~0.4.1",
     "grunt-contrib-uglify": "0.5.1",
     "grunt-contrib-uglify-es": "github:gruntjs/grunt-contrib-uglify#harmony",
+    "grunt-contrib-watch": "1.1.0",
     "grunt-responsive-images": "^0.1.4"
   }
 }

@@ -1,6 +1,7 @@
 module.exports = function (grunt) {
 
   grunt.initConfig({
+    pkg: grunt.file.readJSON('package.json'),
     clean: ['dist'],
     uglify: {
       dist: {
@@ -12,6 +13,7 @@ module.exports = function (grunt) {
         }
       },
       options: {
+        banner:  '/*! <%= pkg.name %> - <%= grunt.template.today("yyyy-mm-dd") %> */',
         report: 'gzip'
       }
     },
@@ -51,6 +53,16 @@ module.exports = function (grunt) {
           dest: 'img/'
         }]
       }
+    },
+    watch: {
+      css: {
+        files: ['css/*.css'],
+        tasks: ['cssmin']
+      },
+      js: {
+        files: ['js/*.js'],
+        tasks: ['uglify']
+      }
     }
   });
 
@@ -58,8 +70,10 @@ module.exports = function (grunt) {
   grunt.loadNpmTasks('grunt-contrib-uglify-es');
   grunt.loadNpmTasks('grunt-contrib-cssmin');
   grunt.loadNpmTasks('grunt-contrib-clean');
+  grunt.loadNpmTasks('grunt-contrib-watch');
 
   grunt.registerTask('images', ['responsive_images'])
   grunt.registerTask('default', ['clean','uglify', 'cssmin']);
+  // grunt.registerTask('watch', ['watch:scripts']);
 
 };

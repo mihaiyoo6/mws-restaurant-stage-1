@@ -141,7 +141,7 @@ function lazyloadImages(){
  */
 createRestaurantHTML = (restaurant) => {
   const li = document.createElement('li');
-
+  li.className = 'favorite';
   const image = document.createElement('img');
   image.alt = `Image of ${restaurant.name} Restaurant`;
   image.title = restaurant.name;
@@ -152,7 +152,6 @@ createRestaurantHTML = (restaurant) => {
   image.setAttribute('data-src-set',`${urlX1} 1x, ${urlX2} 2x`);
   image.src = urlX1;
   li.append(image);
-
   const textHolder = document.createElement('div');
   textHolder.classList.add('restaurant-text');
 
@@ -167,7 +166,12 @@ createRestaurantHTML = (restaurant) => {
   const address = document.createElement('p');
   address.innerHTML = restaurant.address;
   textHolder.append(address);
-
+  const star = document.createElement('span');
+  star.innerHTML =restaurant.is_favorite === 'true' ? '★': '☆';
+  star.setAttribute('is_favorite', restaurant.is_favorite);
+  star.setAttribute('id', restaurant.id);
+  star.onclick = handleFavorite;
+   textHolder.append(star);
   const more = document.createElement('a');
   more.innerHTML = 'View Details';
   more.href = DBHelper.urlForRestaurant(restaurant);
@@ -175,6 +179,26 @@ createRestaurantHTML = (restaurant) => {
   li.append(textHolder);
 
   return li
+}
+
+/**
+ * Handle marking restaurant as favorite
+ */
+handleFavorite=({target})=> {
+  const is_favorite = target.getAttribute('is_favorite') === 'true';
+  const id = target.getAttribute('id');
+  
+  console.log('is_favorite from', id, is_favorite, 'to', !is_favorite);
+  const callback = (err, data)=>{
+    if(!err){
+      target.setAttribute('is_favorite', !is_favorite);
+      target.innerHTML = !is_favorite? '★': '☆';
+    }else{
+      alert('Something when wrong! we are working on it.');
+    }
+
+  }
+  DBHelper.handleFavorite(id, !is_favorite, callback);
 }
 
 /**

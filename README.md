@@ -27,7 +27,7 @@ Fork and clone the [server repository](https://github.com/udacity/mws-restaurant
 
 ```
 npm install
-npm run generate-images
+npm run generate-images //once
 npm run build-assets
 npm start
 ```

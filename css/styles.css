@@ -143,6 +143,7 @@ nav h1 a {
   margin: 10px;
   text-align: left;
   box-shadow: 0 2px 5px 1px rgba(0,0,0,.1);
+  position: relative;
 }
 #restaurants-list .restaurant-img {
   background-color: #ccc;
@@ -187,6 +188,32 @@ nav h1 a {
   text-transform: uppercase;
   width: 100%;
   margin-top: 5px;
+}
+
+#restaurants-list li span {
+  position: absolute;
+  top: 0;
+  right: 0;
+  padding: 0 8px;
+  font-size: 2em;
+  color: #f4cb42;
+  z-index: 1;
+  cursor: pointer;
+}
+
+.favorite::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    border-color: transparent;
+    border-style: solid;
+}
+
+.favorite::after {
+    border-width: 2.6em;
+    border-right-color: white;
+    border-top-color: white;
 }
 
 /* ====================== Restaurant Details ====================== */

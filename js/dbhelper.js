@@ -180,4 +180,19 @@ class DBHelper {
     return marker;
   }
 
+  /**
+   * update favorite api
+   */
+  static handleFavorite(restaurant_id, isFavorite, callback) {
+    fetch(`${this.DATABASE_URL}/${restaurant_id}/?is_favorite=${isFavorite}`,{method: 'PUT'})
+    .then(r=>{
+      if(r.ok&&r.status=== 200){
+        return r;
+      }
+    })
+    .then(r=>r.json())
+    .then(data=>callback(null, data))
+    .catch(err=>callback(err, null))
+  }
+
 }
