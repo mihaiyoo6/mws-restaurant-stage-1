@@ -52,6 +52,12 @@ fillRestaurantHTML = (restaurant = self.restaurant) => {
   const name = document.getElementById('restaurant-name');
   name.innerHTML = restaurant.name;
 
+  const star = document.getElementById('restaurant-favorite');
+  star.innerHTML = restaurant.is_favorite === 'true' ? '★': '☆';
+  star.setAttribute('is_favorite', restaurant.is_favorite);
+  star.setAttribute('id', restaurant.id);
+  star.onclick = handleFavorite;
+
   const address = document.getElementById('restaurant-address');
   address.innerHTML = restaurant.address;
 
@@ -170,4 +176,24 @@ getParameterByName = (name, url) => {
   if (!results[2])
     return '';
   return decodeURIComponent(results[2].replace(/\+/g, ' '));
+}
+
+/**
+ * Handle marking restaurant as favorite
+ */
+handleFavorite=({target})=> {
+  const is_favorite = target.getAttribute('is_favorite') === 'true';
+  const id = target.getAttribute('id');
+  
+  console.log('is_favorite from', id, is_favorite, 'to', !is_favorite);
+  const callback = (err, data)=>{
+    if(!err){
+      target.setAttribute('is_favorite', !is_favorite);
+      target.innerHTML = !is_favorite? '★': '☆';
+    }else{
+      alert('Something when wrong! we are working on it.');
+    }
+
+  }
+  DBHelper.handleFavorite(id, !is_favorite, callback);
 }

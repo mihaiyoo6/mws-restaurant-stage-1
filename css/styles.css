@@ -190,7 +190,8 @@ nav h1 a {
   margin-top: 5px;
 }
 
-#restaurants-list li span {
+#restaurants-list li span,
+.favorite-star {
   position: absolute;
   top: 0;
   right: 0;
@@ -269,6 +270,9 @@ nav h1 a {
   padding: 2px 0;
   text-align: center;
   text-transform: uppercase;
+}
+#restaurant-container{
+  position: relative;
 }
 #restaurant-container, #reviews-container {
   padding: 10px;
