@@ -47,18 +47,34 @@ class DBHelper {
    */
   static fetchRestaurantById(id, callback) {
     // fetch all restaurants with proper error handling.
-    DBHelper.fetchRestaurants((error, restaurants) => {
-      if (error) {
-        callback(error, null);
-      } else {
-        const restaurant = restaurants.find(r => r.id == id);
-        if (restaurant) { // Got the restaurant
-          callback(null, restaurant);
-        } else { // Restaurant does not exist in the database
-          callback('Restaurant does not exist', null);
+    Promise.all([
+      fetch(`${this.DATABASE_URL}/${id}`),
+      fetch(`${this.DATABASE_URL.replace('restaurants', 'reviews')}/?restaurant_id=${id}`)
+    ])
+    .then(r=>
+      Promise.all(r.map(response=> {
+        if (!response.ok) {
+          throw Error(r.statusText);
         }
-      }
-    });
+        return response.json();
+      })
+    ))
+    .then(([restaurant, reviews])=>{
+      callback(null, {...restaurant, reviews});
+    })
+    .catch(err=>console.error(err));
+    // DBHelper.fetchRestaurants((error, restaurants) => {
+    //   if (error) {
+    //     callback(error, null);
+    //   } else {
+    //     const restaurant = restaurants.find(r => r.id == id);
+    //     if (restaurant) { // Got the restaurant
+    //       callback(null, restaurant);
+    //     } else { // Restaurant does not exist in the database
+    //       callback('Restaurant does not exist', null);
+    //     }
+    //   }
+    // });
   }
 
   /**

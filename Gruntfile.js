@@ -14,7 +14,8 @@ module.exports = function (grunt) {
       },
       options: {
         banner:  '/*! <%= pkg.name %> - <%= grunt.template.today("yyyy-mm-dd") %> */',
-        report: 'gzip'
+        report: 'gzip',
+        sourceMap: true
       }
     },
     cssmin: {

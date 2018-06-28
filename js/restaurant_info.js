@@ -130,7 +130,7 @@ createReviewHTML = (review) => {
   header.appendChild(name);
 
   const date = document.createElement('span');
-  date.innerHTML = review.date;
+  date.innerHTML = new Date(review.updatedAt).toDateString();
   header.appendChild(date);
 
   li.appendChild(header);
