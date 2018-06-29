@@ -5,6 +5,8 @@ var map;
  * Initialize Google map, called from HTML.
  */
 window.initMap = () => {
+  const addReviewForm = document.getElementById('review-add-form');
+  addReviewForm.addEventListener('submit', reviewAdd);
   fetchRestaurantFromURL((error, restaurant) => {
     if (error) { // Got an error!
       console.error(error);
@@ -196,4 +198,37 @@ handleFavorite=({target})=> {
 
   }
   DBHelper.handleFavorite(id, !is_favorite, callback);
+}
+
+reviewAdd = (e)=>{
+  e.preventDefault();
+  const formEl = e.target;
+  const formData = new FormData(formEl);
+  formData.append('restaurant_id', getParameterByName('id'));
+  const data = {
+    restaurant_id: getParameterByName('id'),
+    isValid: true
+  };
+  for (var [key, value] of formData.entries()) {
+    if(value.length === 0) {
+      const msg = formEl.querySelector('#msg');
+      msg.style.display= 'block';
+      Object.assign(data, {isValid:false});
+    }else{
+      Object.assign(data, {[key]:value});
+    }
+ }
+ if(data.isValid){
+   DBHelper.reviewAdd(formData,(err,response)=>{
+     console.log('err', err, 'data', response);
+     if(err){
+      alert('Something when wrong! we are working on it.');
+      return;
+     }
+     const reviewsContainer  =document.getElementById('reviews-list');
+     reviewsContainer.appendChild(createReviewHTML(response));
+     formEl.reset();
+   });
+ }
+
 }

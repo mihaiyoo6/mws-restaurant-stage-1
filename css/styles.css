@@ -321,6 +321,74 @@ nav h1 a {
 }
 
 
+#reviews-add {
+  background-color: #fff;
+  display: block;
+  overflow: hidden;
+  max-width: 960px;
+  margin: 0 auto;
+  padding-bottom: 20px;
+}
+#reviews-add form {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 0 20px;
+}
+#reviews-add input {
+  flex: 2;
+  padding: 11px 0;
+}
+#reviews-add select {
+  height: 40px;
+  flex: 2;
+}
+#reviews-add textarea {
+  flex: 2;
+}
+#reviews-add span {
+  flex: 1;
+}
+#reviews-add #msg {
+  padding: 5px;
+  border: 1px solid red;
+  border-radius: 5px;
+  font-size: 1.2em;
+  color: white;
+  background: #ff000075;
+  display: none;
+}
+#reviews-add label {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  padding: 5px;
+  align-items: center
+}
+#reviews-add button {
+  background-color: #af5e00;
+  border-bottom: 3px solid #eee;
+  color: #fff;
+  display: inline-block;
+  font-size: 10pt;
+  padding: 8px 0;
+  text-align: center;
+  text-decoration: none;
+  text-transform: uppercase;
+  width: 100%;
+  margin-top: 5px;
+}
+
+.reviews-add-header {
+  display: flex;
+  justify-content: space-between;
+  background: black;
+  color: white;
+  padding: 15px 15px 15px 22px;
+  align-items: center;
+}
+
+
 @media screen and (min-width: 426px) {
   #restaurants-list li {
     width: calc(100% / 3 - 20px);

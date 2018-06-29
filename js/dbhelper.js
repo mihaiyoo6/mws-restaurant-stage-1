@@ -211,4 +211,18 @@ class DBHelper {
     .catch(err=>callback(err, null))
   }
 
+  static reviewAdd(data,callback) {
+    fetch(`${this.DATABASE_URL.replace('restaurants', 'reviews')}`,{
+      method:'POST',
+      body: data
+    })
+    .then(r=>{
+      if(r.ok&&r.status=== 201) {
+        return r;
+      }
+    })
+    .then(r=>r.json())
+    .then(data=>callback(null, data))
+    .catch(err=>callback(err, null))
+  }
 }
