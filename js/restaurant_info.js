@@ -204,31 +204,28 @@ reviewAdd = (e)=>{
   e.preventDefault();
   const formEl = e.target;
   const formData = new FormData(formEl);
+  let isValid = true;
+  const msg = formEl.querySelector('#msg');
   formData.append('restaurant_id', getParameterByName('id'));
-  const data = {
-    restaurant_id: getParameterByName('id'),
-    isValid: true
-  };
+  
   for (var [key, value] of formData.entries()) {
     if(value.length === 0) {
-      const msg = formEl.querySelector('#msg');
-      msg.style.display= 'block';
-      Object.assign(data, {isValid:false});
-    }else{
-      Object.assign(data, {[key]:value});
+      msg.style.display = 'block';
+      isValid = false;
     }
- }
- if(data.isValid){
-   DBHelper.reviewAdd(formData,(err,response)=>{
-     console.log('err', err, 'data', response);
-     if(err){
-      alert('Something when wrong! we are working on it.');
-      return;
-     }
-     const reviewsContainer  =document.getElementById('reviews-list');
-     reviewsContainer.appendChild(createReviewHTML(response));
-     formEl.reset();
-   });
- }
-
+  }
+  if(isValid) {
+    DBHelper.reviewAdd(formData,(err,response)=>{
+      console.log('err', err, 'data', response);
+      if(err){
+        alert('Something when wrong! we are working on it.');
+        return;
+      }
+      const reviewsContainer  =document.getElementById('reviews-list');
+      reviewsContainer.appendChild(createReviewHTML(response));
+      formEl.reset();
+      const msg = formEl.querySelector('#msg');
+      msg.style.display = 'none';
+    });
+  }
 }

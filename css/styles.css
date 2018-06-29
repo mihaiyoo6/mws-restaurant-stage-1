@@ -391,7 +391,7 @@ nav h1 a {
 
 @media screen and (min-width: 426px) {
   #restaurants-list li {
-    width: calc(100% / 3 - 20px);
+    width: calc(100% / 2 - 20px);
     display: flex;
     flex-direction: column;
   }
