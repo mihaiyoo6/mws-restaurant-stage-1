@@ -71,16 +71,32 @@ fillCuisinesHTML = (cuisines = self.cuisines) => {
  * Initialize Google map, called from HTML.
  */
 window.initMap = () => {
+  const mapContainer = document.getElementById('map');
+  // let loc = {
+  //   lat: 40.722216,
+  //   lng: -73.987501
+  // };
+  // self.map = new google.maps.Map(document.getElementById('map'), {
+  //   zoom: 12,
+  //   center: loc,
+  //   scrollwheel: false
+  // });
+  mapContainer.addEventListener('click', showMap)
+  updateRestaurants();
+}
+
+function showMap(e) {
   let loc = {
     lat: 40.722216,
     lng: -73.987501
   };
-  self.map = new google.maps.Map(document.getElementById('map'), {
+  self.map = new google.maps.Map(e.target, {
     zoom: 12,
     center: loc,
     scrollwheel: false
   });
-  updateRestaurants();
+  addMarkersToMap();
+  e.target.removeEventListener(e.type, showMap);
 }
 
 /**
@@ -129,12 +145,11 @@ fillRestaurantsHTML = (restaurants = self.restaurants) => {
   restaurants.forEach(restaurant => {
     ul.append(createRestaurantHTML(restaurant));
   });
-  addMarkersToMap();
   lazyloadImages();
 }
 
-function lazyloadImages(){
-  inView('.restaurant-img').on('enter', image=> image.srcset = image.getAttribute('data-src-set'));
+function lazyloadImages() {
+  inView('.restaurant-img').on('enter', image => image.srcset = image.getAttribute('data-src-set'));
 }
 /**
  * Create restaurant HTML.
@@ -149,7 +164,7 @@ createRestaurantHTML = (restaurant) => {
   const urlX1 = DBHelper.imageUrlForRestaurant(restaurant, '1x', 320);
   const urlX2 = DBHelper.imageUrlForRestaurant(restaurant, '2x', 640);
   image.srcset = 'icons/1px.png';
-  image.setAttribute('data-src-set',`${urlX1} 1x, ${urlX2} 2x`);
+  image.setAttribute('data-src-set', `${urlX1} 1x, ${urlX2} 2x`);
   image.src = urlX1;
   li.append(image);
   const textHolder = document.createElement('div');
@@ -167,11 +182,13 @@ createRestaurantHTML = (restaurant) => {
   address.innerHTML = restaurant.address;
   textHolder.append(address);
   const star = document.createElement('span');
-  star.innerHTML =restaurant.is_favorite === 'true' ? '★': '☆';
+  star.innerHTML = restaurant.is_favorite === 'true' ? '★' : '☆';
   star.setAttribute('is_favorite', restaurant.is_favorite);
+  star.setAttribute('aria-label', `Add restaurant ${restaurant.name} to your favorites`);
+  star.setAttribute('role', 'button');
   star.setAttribute('id', restaurant.id);
   star.onclick = handleFavorite;
-   textHolder.append(star);
+  textHolder.append(star);
   const more = document.createElement('a');
   more.innerHTML = 'View Details';
   more.href = DBHelper.urlForRestaurant(restaurant);
@@ -184,16 +201,16 @@ createRestaurantHTML = (restaurant) => {
 /**
  * Handle marking restaurant as favorite
  */
-handleFavorite=({target})=> {
+handleFavorite = ({ target }) => {
   const is_favorite = target.getAttribute('is_favorite') === 'true';
   const id = target.getAttribute('id');
-  
+
   console.log('is_favorite from', id, is_favorite, 'to', !is_favorite);
-  const callback = (err, data)=>{
-    if(!err){
+  const callback = (err, data) => {
+    if (!err) {
       target.setAttribute('is_favorite', !is_favorite);
-      target.innerHTML = !is_favorite? '★': '☆';
-    }else{
+      target.innerHTML = !is_favorite ? '★' : '☆';
+    } else {
       alert('Something when wrong! we are working on it.');
     }
 
