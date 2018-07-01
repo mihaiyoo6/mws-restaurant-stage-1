@@ -51,18 +51,18 @@ class DBHelper {
       fetch(`${this.DATABASE_URL}/${id}`),
       fetch(`${this.DATABASE_URL.replace('restaurants', 'reviews')}/?restaurant_id=${id}`)
     ])
-    .then(r=>
-      Promise.all(r.map(response=> {
-        if (!response.ok) {
-          throw Error(r.statusText);
-        }
-        return response.json();
+      .then(r =>
+        Promise.all(r.map(response => {
+          if (!response.ok) {
+            throw Error(r.statusText);
+          }
+          return response.json();
+        })
+        ))
+      .then(([restaurant, reviews]) => {
+        callback(null, { ...restaurant, reviews });
       })
-    ))
-    .then(([restaurant, reviews])=>{
-      callback(null, {...restaurant, reviews});
-    })
-    .catch(err=>console.error(err));
+      .catch(err => console.error(err));
     // DBHelper.fetchRestaurants((error, restaurants) => {
     //   if (error) {
     //     callback(error, null);
@@ -200,29 +200,29 @@ class DBHelper {
    * update favorite api
    */
   static handleFavorite(restaurant_id, isFavorite, callback) {
-    fetch(`${this.DATABASE_URL}/${restaurant_id}/?is_favorite=${isFavorite}`,{method: 'PUT'})
-    .then(r=>{
-      if(r.ok&&r.status=== 200){
-        return r;
-      }
-    })
-    .then(r=>r.json())
-    .then(data=>callback(null, data))
-    .catch(err=>callback(err, null))
+    fetch(`${this.DATABASE_URL}/${restaurant_id}/?is_favorite=${isFavorite}`, { method: 'PUT' })
+      .then(r => {
+        if (r.ok) {
+          return r;
+        }
+      })
+      .then(r => r.json())
+      .then(data => callback(null, data))
+      .catch(err => callback(err, null))
   }
 
-  static reviewAdd(data,callback) {
-    fetch(`${this.DATABASE_URL.replace('restaurants', 'reviews')}`,{
-      method:'POST',
+  static reviewAdd(data, callback) {
+    fetch(`${this.DATABASE_URL.replace('restaurants', 'reviews')}`, {
+      method: 'POST',
       body: data
     })
-    .then(r=>{
-      if(r.ok&&r.status=== 201) {
-        return r;
-      }
-    })
-    .then(r=>r.json())
-    .then(data=>callback(null, data))
-    .catch(err=>callback(err, null))
+      .then(r => {
+        if (r.ok) {
+          return r;
+        }
+      })
+      .then(r => r.json())
+      .then(data => callback(null, data))
+      .catch(err => callback(err, null))
   }
 }
