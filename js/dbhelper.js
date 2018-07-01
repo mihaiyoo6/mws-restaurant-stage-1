@@ -200,6 +200,7 @@ class DBHelper {
    * update favorite api
    */
   static handleFavorite(restaurant_id, isFavorite, callback) {
+    this.updateIdb(restaurant_id, isFavorite);
     fetch(`${this.DATABASE_URL}/${restaurant_id}/?is_favorite=${isFavorite}`, { method: 'PUT' })
       .then(r => {
         if (r.ok) {
@@ -209,6 +210,61 @@ class DBHelper {
       .then(r => r.json())
       .then(data => callback(null, data))
       .catch(err => callback(err, null))
+  }
+
+  static updateIdb(restaurant_id, is_favorite) {
+    console.log('isFavorite update', restaurant_id, is_favorite);
+    const dbPromise = idb.open('udacity-restaurant');
+    //update all restaurant data
+    dbPromise
+      .then(db => {
+        const tx = db.transaction('restaurants', 'readwrite');
+        const value = tx
+          .objectStore('restaurants')
+          .get('-1')
+          .then(rData => {
+            if (!rData) {
+              console.log('data is not cached');
+              return;
+            }
+            const data = rData.data;
+            const updatedData = data.map(restaurant => {
+              if (restaurant.id !== restaurant_id) {
+                return restaurant;
+              }
+              return Object.assign(restaurant, { is_favorite });
+            });
+            dbPromise.then(db1 => {
+              const tx1 = db1.transaction('restaurants', 'readwrite');
+              tx1
+                .objectStore('restaurants')
+                .put({ id: '-1', data: updatedData });
+              return tx1.complete;
+            })
+          })
+      })
+    //Update id restaurant data 
+    dbPromise
+      .then(db => {
+        const tx = db.transaction('restaurants', 'readwrite');
+        const value = tx
+          .objectStore('restaurants')
+          .get(restaurant_id)
+          .then(rData => {
+            if (!rData || !rData.data) {
+              console.log(`data for restaurant_id=${restaurant_id} is not cached`);
+              return;
+            }
+            const data = rData.data;
+            dbPromise.then(db1 => {
+              const tx1 = db1.transaction('restaurants', 'readwrite');
+              tx1
+                .objectStore('restaurants')
+                .put({ id: restaurant_id, data: Object.assign(data, { is_favorite }) });
+              return tx1.complete;
+            })
+          })
+      })
   }
 
   static reviewAdd(data, callback) {
