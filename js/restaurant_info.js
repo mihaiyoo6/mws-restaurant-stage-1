@@ -55,7 +55,7 @@ fillRestaurantHTML = (restaurant = self.restaurant) => {
   name.innerHTML = restaurant.name;
 
   const star = document.getElementById('restaurant-favorite');
-  star.innerHTML = restaurant.is_favorite === 'true' ? '★': '☆';
+  star.innerHTML = restaurant.is_favorite === 'true' ? '★' : '☆';
   star.setAttribute('is_favorite', restaurant.is_favorite);
   star.setAttribute('id', restaurant.id);
   star.onclick = handleFavorite;
@@ -183,16 +183,16 @@ getParameterByName = (name, url) => {
 /**
  * Handle marking restaurant as favorite
  */
-handleFavorite=({target})=> {
+handleFavorite = ({ target }) => {
   const is_favorite = target.getAttribute('is_favorite') === 'true';
   const id = target.getAttribute('id');
-  
+
   console.log('is_favorite from', id, is_favorite, 'to', !is_favorite);
-  const callback = (err, data)=>{
-    if(!err){
+  const callback = (err, data) => {
+    if (!err) {
       target.setAttribute('is_favorite', !is_favorite);
-      target.innerHTML = !is_favorite? '★': '☆';
-    }else{
+      target.innerHTML = !is_favorite ? '★' : '☆';
+    } else {
       alert('Something when wrong! we are working on it.');
     }
 
@@ -200,28 +200,28 @@ handleFavorite=({target})=> {
   DBHelper.handleFavorite(id, !is_favorite, callback);
 }
 
-reviewAdd = (e)=>{
+reviewAdd = (e) => {
   e.preventDefault();
   const formEl = e.target;
   const formData = new FormData(formEl);
   let isValid = true;
   const msg = formEl.querySelector('#msg');
   formData.append('restaurant_id', getParameterByName('id'));
-  
-  for (var [key, value] of formData.entries()) {
-    if(value.length === 0) {
+
+  for (let [key, value] of formData.entries()) {
+    if (value.length === 0) {
       msg.style.display = 'block';
       isValid = false;
     }
   }
-  if(isValid) {
-    DBHelper.reviewAdd(formData,(err,response)=>{
+  if (isValid) {
+    DBHelper.reviewAdd(formData, (err, response) => {
       console.log('err', err, 'data', response);
-      if(err){
+      if (err) {
         alert('Something when wrong! we are working on it.');
         return;
       }
-      const reviewsContainer  =document.getElementById('reviews-list');
+      const reviewsContainer = document.getElementById('reviews-list');
       reviewsContainer.appendChild(createReviewHTML(response));
       formEl.reset();
       const msg = formEl.querySelector('#msg');

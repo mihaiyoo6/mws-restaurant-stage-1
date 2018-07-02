@@ -1,3 +1,18 @@
+
+const dbPromise = idb.open('udacity-restaurant', 3, upgradeDB => {
+  switch (upgradeDB.oldVersion) {
+    case 0:
+      upgradeDB.createObjectStore('restaurants', { keyPath: 'id' });
+    case 1:
+      const reviewsStore = upgradeDB.createObjectStore('reviews', { keyPath: 'id' });
+      reviewsStore.createIndex('restaurant_id', 'restaurant_id');
+    case 2:
+      upgradeDB.createObjectStore('toSync', {
+        keyPath: 'id',
+        autoIncrement: true
+      });
+  }
+});
 /**
  * Common database helper functions.
  */
@@ -200,21 +215,23 @@ class DBHelper {
    * update favorite api
    */
   static handleFavorite(restaurant_id, isFavorite, callback) {
-    this.updateIdb(restaurant_id, isFavorite);
-    fetch(`${this.DATABASE_URL}/${restaurant_id}/?is_favorite=${isFavorite}`, { method: 'PUT' })
-      .then(r => {
-        if (r.ok) {
-          return r;
-        }
-      })
-      .then(r => r.json())
-      .then(data => callback(null, data))
-      .catch(err => callback(err, null))
+    this.updateRestaurantsIdb(restaurant_id, isFavorite);
+    const url = `${this.DATABASE_URL}/${restaurant_id}/?is_favorite=${isFavorite}`;
+    const method = 'PUT';
+    this.addToCacheQue({ url, method, payload: { isFavorite }, callback });
+    // fetch(url, { method })
+    //   .then(r => {
+    //     if (r.ok) {
+    //       return r;
+    //     }
+    //   })
+    //   .then(r => r.json())
+    //   .catch(err => callback(err, null))
   }
 
-  static updateIdb(restaurant_id, is_favorite) {
+  static updateRestaurantsIdb(restaurant_id, is_favorite) {
     console.log('isFavorite update', restaurant_id, is_favorite);
-    const dbPromise = idb.open('udacity-restaurant');
+    // const dbPromise = idb.open('udacity-restaurant');
     //update all restaurant data
     dbPromise
       .then(db => {
@@ -264,21 +281,51 @@ class DBHelper {
               return tx1.complete;
             })
           })
-      })
+      });
   }
 
-  static reviewAdd(data, callback) {
-    fetch(`${this.DATABASE_URL.replace('restaurants', 'reviews')}`, {
-      method: 'POST',
-      body: data
-    })
-      .then(r => {
-        if (r.ok) {
-          return r;
-        }
+  static reviewAdd(body, callback) {
+    const url = `${this.DATABASE_URL.replace('restaurants', 'reviews')}`;
+    const method = 'POST';
+    const payload = {};
+    for (const [key, value] of body.entries()) {
+      payload[key] = value;
+    }
+    this.uprateReviesIdb(payload);
+    this.addToCacheQue({ url, method, payload, callback });
+    // fetch(url, {
+    //   method,
+    //   body
+    // })
+    //   .then(r => {
+    //     if (r.ok) {
+    //       return r;
+    //     }
+    //   })
+    //   .then(r => r.json())
+    //   .then(data => callback(null, data))
+    //   .catch(err => callback(err, null));
+  }
+
+  static uprateReviesIdb(data) {
+    console.log('data', data);
+    dbPromise
+      .then(db => {
+        const tx = db.transaction('reviews', 'readwrite');
+        const store = tx.objectStore('reviews');
+        store.put({ id: Date.now(), 'restaurant_id': parseInt(data['restaurant_id']), data })
       })
-      .then(r => r.json())
-      .then(data => callback(null, data))
-      .catch(err => callback(err, null))
+  }
+  static addToCacheQue({ url, method, payload, callback }) {
+    dbPromise
+      .then(db => {
+        const tx = db.transaction('toSync', 'readwrite');
+        tx
+          .objectStore('toSync')
+          .add({ url, method, payload });
+        callback(null, payload);
+        return tx.complete;
+      });
+    navigator.serviceWorker.ready.then(registration => registration.sync.register('offLineSync'));
   }
 }

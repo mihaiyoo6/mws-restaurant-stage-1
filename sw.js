@@ -4,13 +4,18 @@ const DB_NAME = 'restaurants'
 importScripts('./dist/idb.min.js');
 
 
-const dbPromise = idb.open('udacity-restaurant', 2, upgradeDB => {
+const dbPromise = idb.open('udacity-restaurant', 3, upgradeDB => {
   switch (upgradeDB.oldVersion) {
     case 0:
       upgradeDB.createObjectStore(DB_NAME, { keyPath: 'id' });
     case 1:
       const reviewsStore = upgradeDB.createObjectStore('reviews', { keyPath: 'id' });
       reviewsStore.createIndex('restaurant_id', 'restaurant_id');
+    case 2:
+      upgradeDB.createObjectStore('toSync', {
+        keyPath: 'id',
+        autoIncrement: true
+      });
   }
 });
 
@@ -72,7 +77,7 @@ getReviews = (event, id) => {
             dbPromise.then(idb => {
               const itx = idb.transaction('reviews', 'readwrite');
               const store = itx.objectStore('reviews');
-              reviewsData.forEach(review => store.put({ id: review.id, 'restaurant_id': review['restaurant_id'], data: review }))
+              reviewsData.forEach(review => store.put({ id: review.id, 'restaurant_id': parseInt(review['restaurant_id']), data: review }))
               return reviewsData;
             })
           )
@@ -157,3 +162,52 @@ self.addEventListener('activate', event => {
     )
   );
 });
+
+self.addEventListener('sync', event => {
+  if (event.tag == 'offLineSync') {
+    console.log('sync event fired');
+    event.waitUntil(getFromCache());
+  }
+});
+
+getFromCache = () => {
+  return dbPromise.then(db => {
+    const tx = db.transaction('toSync', 'readwrite');
+    tx
+      .objectStore('toSync')
+      .openCursor()
+      .then(function cursorIterate(cursor) {
+        if (!cursor) {
+          return;
+        }
+        const { url, method, payload } = cursor.value;
+        console.log('form SW', { url, method, payload });
+        fetch(url, { method, payload })
+          .then(r => {
+            console.log('r', r);
+            if (r.ok) {
+              const deltx = db.transaction('toSync', 'readwrite');
+              deltx
+                .objectStore('toSync')
+                .openCursor()
+                .then(cursor => {
+                  cursor
+                    .delete()
+                    .then(getFromCache)
+                })
+            }
+          })
+        // return fetch(url, method, payload)
+        //   .then(r => {
+        //     if (r.ok) {
+        //       cursor.delete();
+        //       return cursor.continue().then(cursorIterate);
+        //     }
+        //   })
+        //   .catch(err => {
+        //     console.log(err);
+        //     return cursor.continue().then(cursorIterate)
+        //   })
+      })
+  });
+}
