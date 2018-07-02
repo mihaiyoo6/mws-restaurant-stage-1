@@ -38,7 +38,7 @@ Please see [json](./lighthouse/[s2]-8000-20180626T154031.json) form lightHouse f
 
 ![results](./lighthouse/[s2]-screen.png)
 
-## Project Overview: Stage 2
+## Project Overview: Stage 3
 
 Project Overview
 For the Restaurant Reviews projects, you will incrementally convert a static webpage to a mobile-ready web application. In Stage Three, you will take the connected application you yu built in Stage One and Stage Two and add additional functionality. You will add a form to allow users to create their own reviews. If the app is offline, your form will defer updating to the remote database until a connection is established. Finally, you’ll work to optimize your site to meet even stricter performance benchmarks than the previous project, and test again using Lighthouse.
