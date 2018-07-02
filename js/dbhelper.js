@@ -13,6 +13,48 @@ const dbPromise = idb.open('udacity-restaurant', 3, upgradeDB => {
       });
   }
 });
+
+window.addEventListener('online', function getFromCache() {
+  return dbPromise.then(db => {
+    const tx = db.transaction('toSync', 'readwrite');
+    tx
+      .objectStore('toSync')
+      .openCursor()
+      .then(function cursorIterate(cursor) {
+        if (!cursor) {
+          return;
+        }
+        const { url, method, payload } = cursor.value;
+        console.log('form SW', { url, method, payload });
+        fetch(url, { method, payload })
+          .then(r => {
+            console.log('r', r);
+            if (r.ok) {
+              const deltx = db.transaction('toSync', 'readwrite');
+              deltx
+                .objectStore('toSync')
+                .openCursor()
+                .then(cursor => {
+                  cursor
+                    .delete()
+                    .then(getFromCache)
+                })
+            }
+          })
+        // return fetch(url, method, payload)
+        //   .then(r => {
+        //     if (r.ok) {
+        //       cursor.delete();
+        //       return cursor.continue().then(cursorIterate);
+        //     }
+        //   })
+        //   .catch(err => {
+        //     console.log(err);
+        //     return cursor.continue().then(cursorIterate)
+        //   })
+      })
+  });
+});
 /**
  * Common database helper functions.
  */
@@ -218,15 +260,21 @@ class DBHelper {
     this.updateRestaurantsIdb(restaurant_id, isFavorite);
     const url = `${this.DATABASE_URL}/${restaurant_id}/?is_favorite=${isFavorite}`;
     const method = 'PUT';
-    this.addToCacheQue({ url, method, payload: { isFavorite }, callback });
-    // fetch(url, { method })
-    //   .then(r => {
-    //     if (r.ok) {
-    //       return r;
-    //     }
-    //   })
-    //   .then(r => r.json())
-    //   .catch(err => callback(err, null))
+
+    if (navigator.onLine) {
+      return fetch(url, { method })
+        .then(r => {
+          if (r.ok) {
+            return r;
+          }
+        })
+        .then(r => r.json())
+        .then(data => callback(null, data))
+        .catch(err => callback(err, null))
+    } else {
+      this.addToCacheQue({ url, method, payload: { isFavorite }, callback });
+    }
+
   }
 
   static updateRestaurantsIdb(restaurant_id, is_favorite) {
@@ -246,9 +294,10 @@ class DBHelper {
             }
             const data = rData.data;
             const updatedData = data.map(restaurant => {
-              if (restaurant.id !== restaurant_id) {
+              if (restaurant.id !== parseInt(restaurant_id)) {
                 return restaurant;
               }
+              console.log('assign', restaurant, is_favorite);
               return Object.assign(restaurant, { is_favorite });
             });
             dbPromise.then(db1 => {
@@ -292,19 +341,23 @@ class DBHelper {
       payload[key] = value;
     }
     this.uprateReviesIdb(payload);
-    this.addToCacheQue({ url, method, payload, callback });
-    // fetch(url, {
-    //   method,
-    //   body
-    // })
-    //   .then(r => {
-    //     if (r.ok) {
-    //       return r;
-    //     }
-    //   })
-    //   .then(r => r.json())
-    //   .then(data => callback(null, data))
-    //   .catch(err => callback(err, null));
+    if (navigator.onLine) {
+      return fetch(url, {
+        method,
+        body
+      })
+        .then(r => {
+          if (r.ok) {
+            return r;
+          }
+        })
+        .then(r => r.json())
+        .then(data => callback(null, data))
+        .catch(err => callback(err, null));
+    } else {
+      this.addToCacheQue({ url, method, payload, callback });
+    }
+
   }
 
   static uprateReviesIdb(data) {
@@ -316,6 +369,7 @@ class DBHelper {
         store.put({ id: Date.now(), 'restaurant_id': parseInt(data['restaurant_id']), data })
       })
   }
+
   static addToCacheQue({ url, method, payload, callback }) {
     dbPromise
       .then(db => {
@@ -326,6 +380,5 @@ class DBHelper {
         callback(null, payload);
         return tx.complete;
       });
-    navigator.serviceWorker.ready.then(registration => registration.sync.register('offLineSync'));
   }
 }

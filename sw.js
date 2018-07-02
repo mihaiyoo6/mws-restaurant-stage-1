@@ -163,51 +163,51 @@ self.addEventListener('activate', event => {
   );
 });
 
-self.addEventListener('sync', event => {
-  if (event.tag == 'offLineSync') {
-    console.log('sync event fired');
-    event.waitUntil(getFromCache());
-  }
-});
+// self.addEventListener('sync', event => {
+//   if (event.tag == 'offLineSync') {
+//     console.log('sync event fired');
+//     event.waitUntil(getFromCache());
+//   }
+// });
 
-getFromCache = () => {
-  return dbPromise.then(db => {
-    const tx = db.transaction('toSync', 'readwrite');
-    tx
-      .objectStore('toSync')
-      .openCursor()
-      .then(function cursorIterate(cursor) {
-        if (!cursor) {
-          return;
-        }
-        const { url, method, payload } = cursor.value;
-        console.log('form SW', { url, method, payload });
-        fetch(url, { method, payload })
-          .then(r => {
-            console.log('r', r);
-            if (r.ok) {
-              const deltx = db.transaction('toSync', 'readwrite');
-              deltx
-                .objectStore('toSync')
-                .openCursor()
-                .then(cursor => {
-                  cursor
-                    .delete()
-                    .then(getFromCache)
-                })
-            }
-          })
-        // return fetch(url, method, payload)
-        //   .then(r => {
-        //     if (r.ok) {
-        //       cursor.delete();
-        //       return cursor.continue().then(cursorIterate);
-        //     }
-        //   })
-        //   .catch(err => {
-        //     console.log(err);
-        //     return cursor.continue().then(cursorIterate)
-        //   })
-      })
-  });
-}
+// getFromCache = () => {
+//   return dbPromise.then(db => {
+//     const tx = db.transaction('toSync', 'readwrite');
+//     tx
+//       .objectStore('toSync')
+//       .openCursor()
+//       .then(function cursorIterate(cursor) {
+//         if (!cursor) {
+//           return;
+//         }
+//         const { url, method, payload } = cursor.value;
+//         console.log('form SW', { url, method, payload });
+//         fetch(url, { method, payload })
+//           .then(r => {
+//             console.log('r', r);
+//             if (r.ok) {
+//               const deltx = db.transaction('toSync', 'readwrite');
+//               deltx
+//                 .objectStore('toSync')
+//                 .openCursor()
+//                 .then(cursor => {
+//                   cursor
+//                     .delete()
+//                     .then(getFromCache)
+//                 })
+//             }
+//           })
+//         // return fetch(url, method, payload)
+//         //   .then(r => {
+//         //     if (r.ok) {
+//         //       cursor.delete();
+//         //       return cursor.continue().then(cursorIterate);
+//         //     }
+//         //   })
+//         //   .catch(err => {
+//         //     console.log(err);
+//         //     return cursor.continue().then(cursorIterate)
+//         //   })
+//       })
+//   });
+// }
