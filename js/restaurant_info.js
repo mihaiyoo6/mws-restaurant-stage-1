@@ -207,6 +207,7 @@ reviewAdd = (e) => {
   let isValid = true;
   const msg = formEl.querySelector('#msg');
   formData.append('restaurant_id', getParameterByName('id'));
+  //formData.append('updatedAt', Date.now());
 
   for (let [key, value] of formData.entries()) {
     if (value.length === 0) {

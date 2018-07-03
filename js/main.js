@@ -182,7 +182,8 @@ createRestaurantHTML = (restaurant) => {
   address.innerHTML = restaurant.address;
   textHolder.append(address);
   const star = document.createElement('span');
-  star.innerHTML = restaurant.is_favorite === 'true' ? '★' : '☆';
+  const favoriteFlag = typeof restaurant.is_favorite === 'string' ? restaurant.is_favorite === 'true' : restaurant.is_favorite;
+  star.innerHTML = favoriteFlag ? '★' : '☆';
   star.setAttribute('is_favorite', restaurant.is_favorite);
   star.setAttribute('aria-label', `Add restaurant ${restaurant.name} to your favorites`);
   star.setAttribute('role', 'button');

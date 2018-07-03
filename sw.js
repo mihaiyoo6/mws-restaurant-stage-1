@@ -51,7 +51,7 @@ self.addEventListener('fetch', event => {
 });
 getFromAPI = (event, id) => {
   if (event.request.method !== 'GET') {
-    return fetch(event.request).then(r => r.json());
+    return; //fetch(event.request).then(r => r.json());
   }
   if (event.request.url.includes('reviews')) {
     getReviews(event, id);

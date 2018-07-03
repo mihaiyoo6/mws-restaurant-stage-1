@@ -26,7 +26,8 @@ window.addEventListener('online', function getFromCache() {
         }
         const { url, method, payload } = cursor.value;
         console.log('form SW', { url, method, payload });
-        fetch(url, { method, payload })
+        // delete payload.updatedAt;
+        fetch(url, { method, body: JSON.stringify(payload) })
           .then(r => {
             console.log('r', r);
             if (r.ok) {
@@ -279,6 +280,7 @@ class DBHelper {
 
   static updateRestaurantsIdb(restaurant_id, is_favorite) {
     console.log('isFavorite update', restaurant_id, is_favorite);
+    console.log('type of', typeof is_favorite);
     // const dbPromise = idb.open('udacity-restaurant');
     //update all restaurant data
     dbPromise
@@ -341,6 +343,7 @@ class DBHelper {
       payload[key] = value;
     }
     this.uprateReviesIdb(payload);
+    //body.delete('updatedAt');
     if (navigator.onLine) {
       return fetch(url, {
         method,
@@ -362,6 +365,7 @@ class DBHelper {
 
   static uprateReviesIdb(data) {
     console.log('data', data);
+    Object.assign(data, { updatedAt: Date.now() });
     dbPromise
       .then(db => {
         const tx = db.transaction('reviews', 'readwrite');
